@@ -12,6 +12,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const parseApiError = (err, fallbackMessage) => {
+    if (err.response?.data?.detail) {
+      return err.response.data.detail;
+    }
+    if (err.message === 'Network Error') {
+      return 'Нет соединения с сервером. Проверьте, что backend запущен и доступен по сети.';
+    }
+    return err.message || fallbackMessage;
+  };
+
   // При запуске проверяем, есть ли сохраненный токен
   useEffect(() => {
     loadStoredData();
@@ -56,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.detail || 'Ошибка входа. Проверьте email и пароль.';
+      const message = parseApiError(err, 'Ошибка входа. Проверьте email и пароль.');
       console.error('❌ Ошибка входа:', message);
       setError(message);
       return { success: false, error: message };
@@ -83,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.detail || 'Ошибка регистрации.';
+      const message = parseApiError(err, 'Ошибка регистрации.');
       console.error('❌ Ошибка регистрации:', message);
       setError(message);
       return { success: false, error: message };

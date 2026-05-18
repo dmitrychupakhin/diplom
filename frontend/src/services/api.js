@@ -49,11 +49,12 @@ api.interceptors.response.use(
     } else if (error.request) {
       console.error('🔌 Нет ответа от сервера. Проверьте:');
       console.error('1. Сервер запущен?');
-      console.error('2. Правильный ли IP адрес в constants.js?');
+      console.error('2. Правильный ли API URL?');
       console.error('3. Устройство в той же сети?');
+      console.error(`4. Текущий API URL: ${API_URL}`);
       Alert.alert(
         'Ошибка подключения',
-        'Не удалось подключиться к серверу.\nПроверьте, что сервер запущен и IP адрес правильный.'
+        `Не удалось подключиться к серверу.\n\nURL: ${API_URL}\n\nПроверьте, что сервер запущен и адрес доступен с устройства.`
       );
     }
     

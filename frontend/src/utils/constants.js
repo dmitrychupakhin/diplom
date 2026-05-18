@@ -1,9 +1,48 @@
 // src/utils/constants.js
+import { NativeModules, Platform } from 'react-native';
 
-// API URL - меняйте под свое окружение
-//export const API_URL = 'http://10.0.2.2:8000'; // Android эмулятор
-// export const API_URL = 'http://localhost:8000'; // iOS симулятор
-export const API_URL = 'http://192.168.31.217:8000'; // Реальное устройство (замените IP)
+const API_PORT = 8000;
+
+const trimTrailingSlash = (value) => value.replace(/\/+$/, '');
+const isIpv4 = (host) => /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
+
+const getMetroHostIp = () => {
+  const scriptURL = NativeModules?.SourceCode?.scriptURL;
+  if (!scriptURL) return null;
+
+  const match = scriptURL.match(/^https?:\/\/([^/:]+)/i);
+  const host = match?.[1];
+  if (!host) return null;
+
+  if (host === 'localhost' || host === '127.0.0.1' || isIpv4(host)) {
+    return host;
+  }
+
+  return null;
+};
+
+const getApiUrl = () => {
+  // Явный override для dev/prod окружений
+  const envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (envUrl) {
+    return trimTrailingSlash(envUrl);
+  }
+
+  // Для dev-сессии берем IP машины из Metro bundle URL
+  const metroHostIp = getMetroHostIp();
+  if (metroHostIp && metroHostIp !== 'localhost' && metroHostIp !== '127.0.0.1') {
+    return `http://${metroHostIp}:${API_PORT}`;
+  }
+
+  // Локальные дефолты для симуляторов
+  if (Platform.OS === 'android') {
+    return `http://10.0.2.2:${API_PORT}`;
+  }
+
+  return `http://localhost:${API_PORT}`;
+};
+
+export const API_URL = getApiUrl();
 
 export const GOALS = [
   { label: 'Похудение', value: 'weight_loss', icon: '🔥' },

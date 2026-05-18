@@ -22,7 +22,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://postgres:12345678@localhost:5432/fitness_ai
+      DATABASE_URL: postgresql://fitness_admin:fitness_password@db:5432/fitness_ai
       SECRET_KEY: my-super-secret-key-change-in-production
       GIGACHAT_API_KEY: ${GIGACHAT_API_KEY}
       DEBUG: "True"
